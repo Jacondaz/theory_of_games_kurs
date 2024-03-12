@@ -6,10 +6,15 @@ def check_saddle_point(matr):
     for i in range(len_column):
         temp_list.append(max([matr[j][i] for j in range(len_matr)]))
     betta = min(temp_list)
-    return alpha == betta
+
+    if alpha == betta:
+        return alpha
+    else:
+        return False
 
 
-def crossing_out_rows(mtx):
+def crossing_out_rows(mtx, flag=None):
+
     if len(mtx) >= 2:
         for row in range(len(mtx) - 1):
             temp1 = mtx[row]
@@ -17,15 +22,19 @@ def crossing_out_rows(mtx):
                 temp2 = mtx[row2]
                 if all([x <= y for x, y in zip(temp1, temp2)]):
                     mtx.pop(row)
-                    return crossing_out_rows(mtx)
+                    return crossing_out_rows(mtx, flag=True)
                 elif all([x >= y for x, y in zip(temp1, temp2)]):
                     mtx.pop(row2)
-                    return crossing_out_rows(mtx)
+                    return crossing_out_rows(mtx, flag=True)
 
+    if flag:
+        return crossing_out_columns(mtx)
+    else:
         return mtx
 
 
-def crossing_out_columns(mtx):
+def crossing_out_columns(mtx, flag=None):
+
     if len(mtx) >= 2:
         for elem in range(len(mtx[0]) - 1):
             temp_arr = [x[elem] for x in mtx]
@@ -34,13 +43,16 @@ def crossing_out_columns(mtx):
                 if all([x <= y for x, y in zip(temp_arr, temp_arr2)]):
                     for i in range(len(mtx)):
                         mtx[i].pop(elem2)
-                    return crossing_out_columns(mtx)
+                    return crossing_out_columns(mtx, flag=True)
                 elif all([x >= y for x, y in zip(temp_arr, temp_arr2)]):
                     for j in range(len(mtx)):
                         mtx[j].pop(elem)
-                    return crossing_out_columns(mtx)
+                    return crossing_out_columns(mtx, flag=True)
 
-    return mtx
+    if flag:
+        return crossing_out_rows(mtx)
+    else:
+        return mtx
 
 
 if __name__ == '__main__':
@@ -55,13 +67,10 @@ if __name__ == '__main__':
     k = int(input("Введите количество строк в матрице: "))
     for _ in range(k):
         matrix.append(list(map(int, input().split())))
-    if not check_saddle_point(matrix):
-        cross_row = crossing_out_rows(matrix)
-        cross_column = crossing_out_columns(matrix)
-        while cross_row != cross_column:
-            cross_row = crossing_out_rows(matrix)
-            cross_column = crossing_out_columns(matrix)
-        print(matrix)
 
+    saddle_point = check_saddle_point(matrix)
+    if isinstance(saddle_point, bool):
+        matrix = crossing_out_rows(matrix)
+        print(matrix)
     else:
-        print("Седловая точка")
+        print(f'Седловая точка: {saddle_point}')
