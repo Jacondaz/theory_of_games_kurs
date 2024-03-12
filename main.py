@@ -8,9 +8,19 @@ def check_saddle_point(matr):
     betta = min(temp_list)
 
     if alpha == betta:
-        return alpha
+        max_index, _ = max(enumerate([min(part) for part in matr]), key=lambda pair: pair[1])
+        min_index, _ = min(enumerate(temp_list), key=lambda pair: pair[1])
+        p_list = [0 for _ in range(len(matr))]
+        q_list = [0 for _ in range(len(matr[0]))]
+        p_list[max_index] = 1
+        q_list[min_index] = 1
+        return p_list, q_list, alpha
     else:
         return False
+
+# 9 5 6 7
+# 1 4 3 8
+# 6 3 2 -4
 
 
 def crossing_out_rows(mtx, flag=None):
@@ -73,4 +83,7 @@ if __name__ == '__main__':
         matrix = crossing_out_rows(matrix)
         print(matrix)
     else:
-        print(f'Седловая точка: {saddle_point}')
+        p, q, saddle = saddle_point
+        print(f'Седловая точка: {saddle}')
+        print(f'Стратегия 1 игрока: p = {p}')
+        print(f'Стратегия 2 игрока: q = {q}')
