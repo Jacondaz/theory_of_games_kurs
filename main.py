@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def check_saddle_point(matr):
     len_matr = len(matr)
     len_column = len(matr[0])
@@ -18,13 +21,50 @@ def check_saddle_point(matr):
     else:
         return False
 
+
 # 9 5 6 7
 # 1 4 3 8
-# 6 3 2 -4
+
+def solution_p(matr, ind=None):
+    if ind is None:
+        number1 = matr[0]
+        number2 = matr[1]
+
+        size = np.arange(0, 1.001, 0.001)
+        total = list()
+
+        for coord in size:
+            temp = list()
+            for i in range(len(number1)):
+                temp.append(round(number1[i] * coord + number2[i] * (1 - coord), 3))
+            total.append(min(temp))
+        max_index = total.index(max(total) * 0.001)
+        ind = (max_index, 1 - max_index)
+        return ind, max(total),
+    else:
+        ...
+
+
+# 1 2
+# 3 4
+# 5 6
+def solution_q(matr, inx=None):
+    if inx is None:
+
+        number1 = [x[0] for x in matr]
+        number2 = [x[1] for x in matr]
+
+        size = np.arange(0, 1.001, 0.001)
+        total = list()
+
+        for coord in size:
+            temp = list()
+            for i in range(len(number1)):
+                temp.append(round(number1[i] * coord + number2[i] * (1 - coord), 3))
+            total.append(max(temp))
 
 
 def crossing_out_rows(mtx, flag=None):
-
     if len(mtx) >= 2:
         for row in range(len(mtx) - 1):
             temp1 = mtx[row]
@@ -44,7 +84,6 @@ def crossing_out_rows(mtx, flag=None):
 
 
 def crossing_out_columns(mtx, flag=None):
-
     if len(mtx) >= 2:
         for elem in range(len(mtx[0]) - 1):
             temp_arr = [x[elem] for x in mtx]
@@ -72,7 +111,6 @@ if __name__ == '__main__':
     # 3 5 6 7 1 9
     # 1 2 4 3 0 10
     # 2 1 3 6 5 4
-
     matrix = list()
     k = int(input("Введите количество строк в матрице: "))
     for _ in range(k):
@@ -81,7 +119,13 @@ if __name__ == '__main__':
     saddle_point = check_saddle_point(matrix)
     if isinstance(saddle_point, bool):
         matrix = crossing_out_rows(matrix)
-        print(matrix)
+        if len(matrix) == 2:
+            result_p, weight, index = solution_p(matrix)
+            result_q, weight, index = solution_q(matrix, index)
+        elif len(matrix[0]) == 2:
+            result = solution_q()
+        else:
+            print("Матрица не соответствует виду 2xM или Nx2")
     else:
         p, q, saddle = saddle_point
         print(f'Седловая точка: {saddle}')
