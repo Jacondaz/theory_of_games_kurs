@@ -36,11 +36,12 @@ def solution_p(matr, ind=None):
         for coord in size:
             temp = list()
             for i in range(len(number1)):
-                temp.append(round(number1[i] * coord + number2[i] * (1 - coord), 3))
-            total.append(min(temp))
-        max_index = total.index(max(total) * 0.001)
-        ind = (max_index, 1 - max_index)
-        return ind, max(total),
+                temp.append((i, round(number1[i] * coord + number2[i] * (1 - coord), 3)))
+            total.append(min(temp, key=lambda x: x[1]))
+        max_index = total.index(max(total, key=lambda x: x[1]))
+        set_of_index = list({total[max_index][0], total[max_index - 1][0], total[max_index + 1][0]})
+        return [max_index * 0.001, 1 - max_index * 0.001], solution_q(matr, set_of_index), max(total,
+                                                                                               key=lambda x: x[1])[0]
     else:
         ...
 
@@ -48,6 +49,10 @@ def solution_p(matr, ind=None):
 # 1 2
 # 3 4
 # 5 6
+
+# 9 5 6 7
+# 1 4 3 8
+
 def solution_q(matr, inx=None):
     if inx is None:
 
@@ -62,7 +67,29 @@ def solution_q(matr, inx=None):
             for i in range(len(number1)):
                 temp.append(round(number1[i] * coord + number2[i] * (1 - coord), 3))
             total.append(max(temp))
+    else:
 
+        number1 = [matr[0][ind] for ind in inx]
+        number2 = [matr[1][ind] for ind in inx]
+
+        size = np.arange(0, 1.001, 0.001)
+        total = list()
+        results = [0 for _ in range(len(matr[0]))]
+
+        for coord in size:
+            temp = list()
+            for i in range(len(number1)):
+                temp.append((i, round(number1[i] * coord + number2[i] * (1 - coord), 3)))
+            total.append(max(temp, key=lambda x: x[1]))
+
+        index = total.index(min(total, key=lambda x: x[1])) * 0.001
+        max_index = min(total, key=lambda x: x[1])
+        sol = [index, 1 - index]
+        for t in inx:
+            results[t] = sol[0]
+            sol.pop(0)
+
+        return results
 
 def crossing_out_rows(mtx, flag=None):
     if len(mtx) >= 2:
@@ -120,10 +147,12 @@ if __name__ == '__main__':
     if isinstance(saddle_point, bool):
         matrix = crossing_out_rows(matrix)
         if len(matrix) == 2:
-            result_p, weight, index = solution_p(matrix)
-            result_q, weight, index = solution_q(matrix, index)
+            result_p, result_q, weight = solution_p(matrix)
+            print(f'Стратегия 1 игрока: p = {result_p}')
+            print(f'Стратегия 2 игрока: q = {result_q}')
+            print(f'Стоимость игры: V = {weight}')
         elif len(matrix[0]) == 2:
-            result = solution_q()
+            result_q, result_p, weight = solution_q(matrix)
         else:
             print("Матрица не соответствует виду 2xM или Nx2")
     else:
