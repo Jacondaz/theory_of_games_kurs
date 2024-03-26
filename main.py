@@ -41,7 +41,7 @@ def solution_p(matr, ind=None):
         max_index = total.index(max(total, key=lambda x: x[1]))
         set_of_index = list({total[max_index][0], total[max_index - 1][0], total[max_index + 1][0]})
         return [max_index * 0.001, 1 - max_index * 0.001], solution_q(matr, set_of_index), max(total,
-                                                                                               key=lambda x: x[1])[0]
+                                                                                               key=lambda x: x[1])[1]
     else:
         ...
 
@@ -78,12 +78,12 @@ def solution_q(matr, inx=None):
 
         for coord in size:
             temp = list()
-            for i in range(len(number1)):
-                temp.append((i, round(number1[i] * coord + number2[i] * (1 - coord), 3)))
+            for i in range(len(number1) - 1):
+                temp.append((i, round(number1[i] * coord + number1[i + 1] * (1 - coord), 3)))
+                temp.append((i, round(number2[i] * coord + number2[i + 1] * (1 - coord), 3)))
             total.append(max(temp, key=lambda x: x[1]))
 
         index = total.index(min(total, key=lambda x: x[1])) * 0.001
-        max_index = min(total, key=lambda x: x[1])
         sol = [index, 1 - index]
         for t in inx:
             results[t] = sol[0]
@@ -91,7 +91,8 @@ def solution_q(matr, inx=None):
 
         return results
 
-def crossing_out_rows(mtx, flag=None):
+
+def crossing_out_rows(mtx):
     if len(mtx) >= 2:
         for row in range(len(mtx) - 1):
             temp1 = mtx[row]
@@ -99,18 +100,15 @@ def crossing_out_rows(mtx, flag=None):
                 temp2 = mtx[row2]
                 if all([x <= y for x, y in zip(temp1, temp2)]):
                     mtx.pop(row)
-                    return crossing_out_rows(mtx, flag=True)
+                    return crossing_out_columns(mtx)
                 elif all([x >= y for x, y in zip(temp1, temp2)]):
                     mtx.pop(row2)
-                    return crossing_out_rows(mtx, flag=True)
+                    return crossing_out_columns(mtx)
 
-    if flag:
-        return crossing_out_columns(mtx)
-    else:
-        return mtx
+    return crossing_out_columns(mtx)
 
 
-def crossing_out_columns(mtx, flag=None):
+def crossing_out_columns(mtx):
     if len(mtx) >= 2:
         for elem in range(len(mtx[0]) - 1):
             temp_arr = [x[elem] for x in mtx]
@@ -119,25 +117,17 @@ def crossing_out_columns(mtx, flag=None):
                 if all([x <= y for x, y in zip(temp_arr, temp_arr2)]):
                     for i in range(len(mtx)):
                         mtx[i].pop(elem2)
-                    return crossing_out_columns(mtx, flag=True)
+                    return crossing_out_rows(mtx)
                 elif all([x >= y for x, y in zip(temp_arr, temp_arr2)]):
                     for j in range(len(mtx)):
                         mtx[j].pop(elem)
-                    return crossing_out_columns(mtx, flag=True)
+                    return crossing_out_rows(mtx)
 
-    if flag:
-        return crossing_out_rows(mtx)
-    else:
-        return mtx
+    return mtx
 
 
 if __name__ == '__main__':
 
-    # 4 -2 5 1 2 7
-    # 1 2 4 3 0 10
-    # 3 5 6 7 1 9
-    # 1 2 4 3 0 10
-    # 2 1 3 6 5 4
     matrix = list()
     k = int(input("Введите количество строк в матрице: "))
     for _ in range(k):
