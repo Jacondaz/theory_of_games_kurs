@@ -37,8 +37,9 @@ def solution_p(matr, ind=None):
             total.append(min(temp, key=lambda x: x[1]))
         max_index = total.index(max(total, key=lambda x: x[1]))
         set_of_index = list({total[max_index][0], total[max_index - 1][0], total[max_index + 1][0]})
-        return [round(max_index * 0.001, 3), round(1 - max_index * 0.001, 3)], solution_q(matr, set_of_index), max(total,
-                                                                                               key=lambda x: x[1])[1]
+        return [round(max_index * 0.001, 3), round(1 - max_index * 0.001, 3)], solution_q(matr, set_of_index), \
+            max(total,
+                key=lambda x: x[1])[1]
     else:
         number1 = matr[ind[0]]
         number2 = matr[ind[1]]
@@ -74,7 +75,8 @@ def solution_q(matr, inx=None):
             total.append(max(temp, key=lambda x: x[1]))
         index = total.index(min(total, key=lambda x: x[1]))
         set_of_index = list({total[index][0], total[index - 1][0], total[index + 1][0]})
-        return [round(index * 0.001,3), round(1 - index * 0.001,3)], solution_p(matr, set_of_index), min(total, key=lambda x: x[1])[1]
+        return [round(index * 0.001, 3), round(1 - index * 0.001, 3)], solution_p(matr, set_of_index), \
+            min(total, key=lambda x: x[1])[1]
 
     else:
 
@@ -101,36 +103,38 @@ def solution_q(matr, inx=None):
         return results
 
 
-def crossing_out_rows(mtx):
-    if len(mtx) >= 2:
-        for row in range(len(mtx) - 1):
-            temp1 = mtx[row]
-            for row2 in range(row + 1, len(mtx)):
-                temp2 = mtx[row2]
-                if all([x <= y for x, y in zip(temp1, temp2)]):
-                    mtx.pop(row)
-                    return crossing_out_columns(mtx)
-                elif all([x >= y for x, y in zip(temp1, temp2)]):
-                    mtx.pop(row2)
-                    return crossing_out_columns(mtx)
+def crossing_out_rows(mtx, mtx_copy):
+    for row in range(len(mtx) - 1):
+        temp1 = mtx[row]
+        for row2 in range(row + 1, len(mtx)):
+            temp2 = mtx[row2]
+            tmp = [x <= y for x, y in zip(temp1, temp2) if x is not None and y is not None]
+            if all(tmp) and len(tmp) != 0:
+                mtx[row] = [None for _ in range(len(temp1))]
+                return crossing_out_columns(mtx, mtx_copy)
+            tmp = [x >= y for x, y in zip(temp1, temp2) if x is not None and y is not None]
+            if all(tmp) and len(tmp) != 0:
+                mtx[row2] = [None for _ in range(len(temp1))]
+                return crossing_out_columns(mtx, mtx_copy)
 
-    return crossing_out_columns(mtx)
+    return crossing_out_columns(mtx, mtx_copy)
 
 
-def crossing_out_columns(mtx):
-    if len(mtx) >= 2:
-        for elem in range(len(mtx[0]) - 1):
-            temp_arr = [x[elem] for x in mtx]
-            for elem2 in range(elem + 1, len(mtx[0])):
-                temp_arr2 = [x[elem2] for x in mtx]
-                if all([x <= y for x, y in zip(temp_arr, temp_arr2)]):
-                    for i in range(len(mtx)):
-                        mtx[i].pop(elem2)
-                    return crossing_out_rows(mtx)
-                elif all([x >= y for x, y in zip(temp_arr, temp_arr2)]):
-                    for j in range(len(mtx)):
-                        mtx[j].pop(elem)
-                    return crossing_out_rows(mtx)
+def crossing_out_columns(mtx, mtx_copy):
+    for elem in range(len(mtx[0]) - 1):
+        temp_arr = [x[elem] for x in mtx]
+        for elem2 in range(elem + 1, len(mtx[0])):
+            temp_arr2 = [x[elem2] for x in mtx]
+            tmp = [x <= y for x, y in zip(temp_arr, temp_arr2) if x is not None and y is not None]
+            if all(tmp) and len(tmp) != 0:
+                for i in range(len(mtx)):
+                    mtx[i][elem2] = None
+                return crossing_out_rows(mtx, mtx_copy)
+            tmp = [x >= y for x, y in zip(temp_arr, temp_arr2) if x is not None and y is not None]
+            if all(tmp) and len(tmp) != 0:
+                for j in range(len(mtx)):
+                    mtx[j][elem] = None
+                return crossing_out_rows(mtx, mtx_copy)
 
     return mtx
 
@@ -138,25 +142,38 @@ def crossing_out_columns(mtx):
 if __name__ == '__main__':
 
     matrix = list()
+    matrix_copy = list()
     k = int(input("Введите количество строк в матрице: "))
     for _ in range(k):
         matrix.append(list(map(int, input().split())))
-
     saddle_point = check_saddle_point(matrix)
     if isinstance(saddle_point, bool):
-        matrix = crossing_out_rows(matrix)
+        matrix = crossing_out_rows(matrix, matrix_copy)
+        for r in matrix:
+            tp = list()
+            for elem in r:
+                if elem is not None:
+                    tp.append(elem)
+            matrix_copy.append(tp)
+
         if len(matrix) == 2:
-            result_p, result_q, weight = solution_p(matrix)
+            result_p, result_q, weight = solution_p(matrix_copy)
+            for ind in range(len(matrix[0])):
+                if matrix[0][ind] is None:
+                    result_q.insert(ind, 0)
             print(f'Стратегия 1 игрока: p = {result_p}')
             print(f'Стратегия 2 игрока: q = {result_q}')
             print(f'Стоимость игры: V = {weight}')
         elif len(matrix[0]) == 2:
-            result_q, result_p, weight = solution_q(matrix)
+            result_q, result_p, weight = solution_q(matrix_copy)
+            for ind in range(len(matrix)):
+                if matrix[ind][0] is None:
+                    result_p.insert(ind, 0)
             print(f'Стратегия 1 игрока: p = {result_p}')
             print(f'Стратегия 2 игрока: q = {result_q}')
             print(f'Стоимость игры: V = {weight}')
         else:
-            print("Матрица не соответствует виду 2xM или Nx2")
+            print("Матрицу невозможно привести к виду 2xM или Nx2")
     else:
         p, q, saddle = saddle_point
         print(f'Седловая точка: {saddle}')
