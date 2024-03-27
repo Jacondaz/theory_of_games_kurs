@@ -22,9 +22,6 @@ def check_saddle_point(matr):
         return False
 
 
-# 9 5 6 7
-# 1 4 3 8
-
 def solution_p(matr, ind=None):
     if ind is None:
         number1 = matr[0]
@@ -40,33 +37,45 @@ def solution_p(matr, ind=None):
             total.append(min(temp, key=lambda x: x[1]))
         max_index = total.index(max(total, key=lambda x: x[1]))
         set_of_index = list({total[max_index][0], total[max_index - 1][0], total[max_index + 1][0]})
-        return [max_index * 0.001, 1 - max_index * 0.001], solution_q(matr, set_of_index), max(total,
+        return [round(max_index * 0.001, 3), round(1 - max_index * 0.001, 3)], solution_q(matr, set_of_index), max(total,
                                                                                                key=lambda x: x[1])[1]
     else:
-        ...
+        number1 = matr[ind[0]]
+        number2 = matr[ind[1]]
+        size = np.arange(0, 1.001, 0.001)
+        total = list()
+        results = [0 for _ in range(len(matr))]
 
+        for coord in size:
+            temp = list()
+            for i in range(len(number1)):
+                temp.append((i, round(number1[i] * coord + number2[i] * (1 - coord), 3)))
+            total.append(min(temp, key=lambda x: x[1]))
+        max_index = total.index(max(total, key=lambda x: x[1])) * 0.001
+        sol = [max_index, 1 - max_index]
+        for t in ind:
+            results[t] = sol[0]
+            sol.pop(0)
+        return results
 
-# 1 2
-# 3 4
-# 5 6
-
-# 9 5 6 7
-# 1 4 3 8
 
 def solution_q(matr, inx=None):
     if inx is None:
 
         number1 = [x[0] for x in matr]
         number2 = [x[1] for x in matr]
-
         size = np.arange(0, 1.001, 0.001)
         total = list()
 
         for coord in size:
             temp = list()
             for i in range(len(number1)):
-                temp.append(round(number1[i] * coord + number2[i] * (1 - coord), 3))
-            total.append(max(temp))
+                temp.append((i, round(number1[i] * coord + number2[i] * (1 - coord), 3)))
+            total.append(max(temp, key=lambda x: x[1]))
+        index = total.index(min(total, key=lambda x: x[1]))
+        set_of_index = list({total[index][0], total[index - 1][0], total[index + 1][0]})
+        return [round(index * 0.001,3), round(1 - index * 0.001,3)], solution_p(matr, set_of_index), min(total, key=lambda x: x[1])[1]
+
     else:
 
         number1 = [matr[0][ind] for ind in inx]
@@ -143,6 +152,9 @@ if __name__ == '__main__':
             print(f'Стоимость игры: V = {weight}')
         elif len(matrix[0]) == 2:
             result_q, result_p, weight = solution_q(matrix)
+            print(f'Стратегия 1 игрока: p = {result_p}')
+            print(f'Стратегия 2 игрока: q = {result_q}')
+            print(f'Стоимость игры: V = {weight}')
         else:
             print("Матрица не соответствует виду 2xM или Nx2")
     else:
