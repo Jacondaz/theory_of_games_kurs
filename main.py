@@ -23,6 +23,7 @@ def check_saddle_point(matr):
 
 
 def solution_p(matr, ind=None):
+    fix, ax = plt.subplots()
     if ind is None:
         number1 = matr[0]
         number2 = matr[1]
@@ -36,10 +37,20 @@ def solution_p(matr, ind=None):
             total.append(min(temp, key=lambda x: x[1]))
         total_list = [x[1] for x in total]
         max_index = total.index(max(total, key=lambda x: x[1]))
-        plt.plot(size, total_list)
-        plt.scatter([max_index * 0.001], [max(total, key=lambda x: x[1])[1]], c='r')
+
+        for i in range(len(number1)):
+            temp = list()
+            for coord in size:
+                temp.append(round(number1[i] * coord + number2[i] * (1 - coord), 3))
+            ax.plot(size, temp, label=f'{i + 1}')
+        ax.plot(size, total_list, label='Нужная область')
+        ax.scatter([max_index * 0.001], [max(total, key=lambda x: x[1])[1]], c='r')
+        ax.set_xlabel("p")
+        ax.set_ylabel("V")
+        ax.legend()
         plt.grid()
         plt.show()
+
         set_of_index = list({total[max_index][0], total[max_index - 1][0], total[max_index + 1][0]})
         return [round(max_index * 0.001, 3), round(1 - max_index * 0.001, 3)], solution_q(matr, set_of_index), \
             max(total,
@@ -56,15 +67,31 @@ def solution_p(matr, ind=None):
             for i in range(len(number1)):
                 temp.append((i, round(number1[i] * coord + number2[i] * (1 - coord), 3)))
             total.append(min(temp, key=lambda x: x[1]))
+        total_list = [x[1] for x in total]
         max_index = total.index(max(total, key=lambda x: x[1])) * 0.001
         sol = [max_index, 1 - max_index]
         for t in ind:
             results[t] = sol[0]
             sol.pop(0)
+
+        for i in range(len(number1)):
+            temp = list()
+            for coord in size:
+                temp.append(round(number1[i] * coord + number2[i] * (1 - coord), 3))
+            ax.plot(size, temp, label=f'{i + 1}')
+        ax.plot(size, total_list, label='Нужная область')
+        ax.scatter([max_index], [max(total, key=lambda x: x[1])[1]], c='r')
+        ax.set_xlabel("p")
+        ax.set_ylabel("V")
+        ax.legend()
+        plt.grid()
+        plt.show()
+
         return results
 
 
 def solution_q(matr, inx=None):
+    fig2, ax2 = plt.subplots()
     if inx is None:
 
         number1 = [x[0] for x in matr]
@@ -77,8 +104,23 @@ def solution_q(matr, inx=None):
             for i in range(len(number1)):
                 temp.append((i, round(number1[i] * coord + number2[i] * (1 - coord), 3)))
             total.append(max(temp, key=lambda x: x[1]))
+        total_list = [x[1] for x in total]
         index = total.index(min(total, key=lambda x: x[1]))
         set_of_index = list({total[index][0], total[index - 1][0], total[index + 1][0]})
+
+        for i in range(len(number1)):
+            temp = list()
+            for coord in size:
+                temp.append(round(number1[i] * coord + number2[i] * (1 - coord), 3))
+            ax2.plot(size, temp, label=f'{i + 1}')
+        ax2.plot(size, total_list, label='Нужная область')
+        ax2.scatter([index * 0.001], [min(total, key=lambda x: x[1])[1]], c='r')
+        ax2.set_xlabel("q")
+        ax2.set_ylabel("V")
+        ax2.legend()
+        plt.grid()
+        plt.show()
+
         return [round(index * 0.001, 3), round(1 - index * 0.001, 3)], solution_p(matr, set_of_index), \
             min(total, key=lambda x: x[1])[1]
 
@@ -103,6 +145,23 @@ def solution_q(matr, inx=None):
         for t in inx:
             results[t] = sol[0]
             sol.pop(0)
+
+        for i in range(len(number1) - 1):
+            temp1 = list()
+            temp2 = list()
+            for coord in size:
+                temp1.append(round(number1[i] * coord + number1[i] * (1 - coord), 3))
+                temp2.append(round(number2[i] * coord + number2[i + 1] * (1 - coord), 3))
+            ax2.plot(size, temp1, label=f'{i + 1}')
+            ax2.plot(size, temp2, label=f'{i + 1}')
+        total_list = [x[1] for x in total]
+        ax2.plot(size, total_list, label='Нужная область')
+        ax2.scatter([index * 0.001], [min(total, key=lambda x: x[1])[1]], c='r')
+        ax2.set_xlabel("q")
+        ax2.set_ylabel("V")
+        ax2.legend()
+        plt.grid()
+        plt.show()
 
         return results
 
