@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def check_saddle_point(matr):
     len_matr = len(matr)
@@ -29,13 +29,17 @@ def solution_p(matr, ind=None):
 
         size = np.arange(0, 1.001, 0.001)
         total = list()
-
         for coord in size:
             temp = list()
             for i in range(len(number1)):
                 temp.append((i, round(number1[i] * coord + number2[i] * (1 - coord), 3)))
             total.append(min(temp, key=lambda x: x[1]))
+        total_list = [x[1] for x in total]
         max_index = total.index(max(total, key=lambda x: x[1]))
+        plt.plot(size, total_list)
+        plt.scatter([max_index * 0.001], [max(total, key=lambda x: x[1])[1]], c='r')
+        plt.grid()
+        plt.show()
         set_of_index = list({total[max_index][0], total[max_index - 1][0], total[max_index + 1][0]})
         return [round(max_index * 0.001, 3), round(1 - max_index * 0.001, 3)], solution_q(matr, set_of_index), \
             max(total,
