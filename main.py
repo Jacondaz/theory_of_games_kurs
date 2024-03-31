@@ -141,7 +141,7 @@ def solution_q(matr, inx=None):
             total.append(max(temp, key=lambda x: x[1]))
 
         index = total.index(min(total, key=lambda x: x[1])) * 0.001
-        sol = [index, 1 - index]
+        sol = [round(index, 3), round(1 - index, 3)]
         for t in inx:
             results[t] = sol[0]
             sol.pop(0)
@@ -150,13 +150,13 @@ def solution_q(matr, inx=None):
             temp1 = list()
             temp2 = list()
             for coord in size:
-                temp1.append(round(number1[i] * coord + number1[i] * (1 - coord), 3))
+                temp1.append(round(number1[i] * coord + number1[i + 1] * (1 - coord), 3))
                 temp2.append(round(number2[i] * coord + number2[i + 1] * (1 - coord), 3))
-            ax2.plot(size, temp1, label=f'{i + 1}')
-            ax2.plot(size, temp2, label=f'{i + 1}')
+            ax2.plot(size, temp1, label=f'{1}')
+            ax2.plot(size, temp2, label=f'{2}')
         total_list = [x[1] for x in total]
         ax2.plot(size, total_list, label='Нужная область')
-        ax2.scatter([index * 0.001], [min(total, key=lambda x: x[1])[1]], c='r')
+        ax2.scatter([index], [min(total, key=lambda x: x[1])[1]], c='r')
         ax2.set_xlabel("q")
         ax2.set_ylabel("V")
         ax2.legend()
@@ -218,6 +218,9 @@ if __name__ == '__main__':
                 if elem is not None:
                     tp.append(elem)
             matrix_copy.append(tp)
+        for z in matrix_copy:
+            if not z:
+                matrix_copy.remove(z)
 
         if len(matrix) == 2:
             result_p, result_q, weight = solution_p(matrix_copy)
